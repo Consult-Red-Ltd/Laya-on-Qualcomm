@@ -1,0 +1,13 @@
+# Build artifacts: never commit models, SDK files or compiled binaries
+*.onnx
+*.onnx.data
+*.dlc
+*.bin
+*.so
+*.zip
+onnx/
+build/
+out/
+__pycache__/
+*.pyc
+.venv/

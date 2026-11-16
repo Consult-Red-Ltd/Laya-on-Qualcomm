@@ -1,0 +1,27 @@
+Subject: Checkout service failing for a subset of customers since this morning
+
+Hi team, I am writing on behalf of a mid-sized online retailer that has been using your platform for about three years. Since roughly 07:40 this morning a share of our customers cannot complete checkout. The payment page loads, the card form accepts details, and then the request hangs for around thirty seconds before the browser shows a generic error. Some customers retry and get charged twice, which is what our support desk noticed first, because the complaints were about duplicate charges rather than about the outage itself.
+
+What we have checked so far. Our own application servers look healthy: CPU is below forty percent, memory is flat, and the error rate on every endpoint other than checkout is normal. The checkout endpoint itself returns a timeout from the upstream payment gateway in about one request out of six. The failures are not tied to a single browser or country. They do seem to cluster around customers whose basket contains a gift card, but we are not certain this is causal, since gift cards are popular this week because of a seasonal campaign.
+
+We rolled back our last deployment, which was a minor change to the shipping cost calculator made yesterday afternoon, and the problem did not go away. We also restarted the checkout workers one by one. Each restart helped for a few minutes and then the timeouts came back at the same rate. Our database team confirmed that there are no long-running locks and that replication lag is under one second.
+
+Timeline as far as we can reconstruct it. At 07:40 the first timeout appears in our logs. At 08:15 the support desk receives the first message about a double charge. At 08:50 our on-call engineer opens an internal incident. At 09:30 we roll back the shipping change. At 10:05 we restart the workers. At 10:40 we contact you through the standard support form, and we have not heard back yet, which is why I am writing again with more detail.
+
+Business impact. Checkout normally handles around two thousand orders per hour at this time of day. Right now we are seeing about sixteen hundred, so we estimate that we are losing several hundred orders every hour, plus the cost of refunding duplicate charges and the time our support desk spends apologising to customers. The seasonal campaign ends on Sunday, and this is the period in which we make a large part of our quarterly revenue. Our management has asked for an update every hour.
+
+What we need from you. First, please confirm whether there is a known incident on the payment gateway side, in particular anything related to gift card validation or to the fraud checks that run before authorisation. Second, please tell us whether the duplicate charges will be reversed automatically or whether we need to issue refunds ourselves. Third, if the problem is on our side, we would appreciate any pointers on which logs or request identifiers would help your engineers investigate, so that we can collect them now rather than after another round of questions.
+
+We have attached a sample of twenty failing request identifiers, the exact error message shown to customers, and a graph of the timeout rate over the last six hours. The graph shows a sharp step at 07:40 and a flat plateau since then, without any gradual build-up, which makes us suspect a configuration change somewhere rather than a capacity problem.
+
+A few more observations that may or may not be relevant. The failing requests take almost exactly thirty seconds, which matches the default timeout we configured for the gateway client, so the gateway is probably not rejecting the requests but simply not answering. Requests from our staging environment, which talks to your sandbox, work normally. Customers who pay with a stored card, rather than typing the card details again, seem to fail less often, although the sample is small. We have not changed any credentials, certificates or network rules in the last two weeks.
+
+To be clear about the tone of this message: we have been happy with the service for a long time, and we understand that incidents happen. However, the lack of any response so far is a problem for us, and if we cannot get an answer within the next two hours we will have to consider switching our checkout to the backup provider, which we would rather avoid, because it means a weaker fraud screening setup and a different payment page that our customers are not used to.
+
+Please treat this as urgent. I am available by phone for the rest of the day, and our on-call engineer can join a call at short notice. If it helps, we can also enable verbose logging on the gateway client for a limited period, but we would like your guidance first, because verbose logs on our side include partial card data and we need to handle them carefully.
+
+Thank you, and I look forward to hearing from you soon.
+
+Update, 11:20. The timeout rate has increased slightly, to about one request in five. We have now also seen two failures for baskets without a gift card, so the gift card pattern may have been a coincidence. Our finance team counted forty-three confirmed duplicate charges so far. We have paused the email campaign that was driving traffic to the seasonal offer, to reduce the number of affected customers while we wait for your answer.
+
+Update, 11:45. Still no reply. We are preparing the switch to the backup provider so that it can be done quickly if needed, and we will make the final decision at 12:30.

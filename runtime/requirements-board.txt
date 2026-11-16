@@ -1,0 +1,6 @@
+# Board (aarch64, Python 3.10): Laya plus the CPU baseline. Install torch from the CPU index:
+#   pip install --index-url https://download.pytorch.org/whl/cpu torch==2.14.1
+laya==0.4.7
+transformers==5.19.0
+onnxruntime==1.23.2
+numpy<2.3
